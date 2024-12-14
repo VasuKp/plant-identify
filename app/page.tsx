@@ -6,8 +6,17 @@ import ImageUpload from './components/ImageUpload'
 import PlantInfo from './components/PlantInfo'
 import Footer from './components/Footer'
 
+interface PlantInfo {
+  description: string;
+  commonName: string;
+  scientificName: string;
+  careInstructions: string;
+  idealConditions: string;
+}
+
 export default function Home() {
-  const [plantData, setPlantData] = useState(null)
+  const [plantData, setPlantData] = useState<PlantInfo | null>(null);
+  // const [plantData, setPlantData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -15,6 +24,7 @@ export default function Home() {
   const handleUploadCardClick = () => {
     fileInputRef.current?.click();
   };
+
 
   const identifyPlant = async (imageBase64: string) => {
     setLoading(true)
@@ -71,19 +81,19 @@ export default function Home() {
         const extractSection = (content: string, startMarker: string, endMarker: string) => {
           const startIndex = content.toLowerCase().indexOf(startMarker.toLowerCase())
           if (startIndex === -1) return ''
-          
+
           const searchFrom = startIndex + startMarker.length
-          const endIndex = endMarker 
+          const endIndex = endMarker
             ? content.toLowerCase().indexOf(endMarker.toLowerCase(), searchFrom)
             : content.length
-          
+
           const extracted = content.slice(searchFrom, endIndex === -1 ? undefined : endIndex)
           return cleanText(extracted)
         }
 
         const description = extractSection(text, 'Description:', 'Plant Details:')
         const detailsSection = text.slice(text.toLowerCase().indexOf('plant details:'))
-        
+
         const commonName = extractSection(detailsSection, 'Common Name:', 'Scientific Name:')
         const scientificName = extractSection(detailsSection, 'Scientific Name:', 'Care Instructions:')
         const careInstructions = extractSection(detailsSection, 'Care Instructions:', 'Ideal Conditions:')
@@ -121,7 +131,7 @@ export default function Home() {
           </div>
         </div>
       </nav>
-      
+
       <main className="flex-grow py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="space-y-8">
@@ -150,16 +160,16 @@ export default function Home() {
                   <div className="relative w-24 h-24 mx-auto mb-4">
                     {/* Leaf Loading Animation */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <svg 
-                        className="animate-spin-slow w-16 h-16 text-[#22c55e]" 
+                      <svg
+                        className="animate-spin-slow w-16 h-16 text-[#22c55e]"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                       >
-                        <path d="M17.12,22.75a2.57,2.57,0,0,1-1.67-.62c-1.52-1.31-2.89-2.53-4.12-3.65l-.24-.22c-1.66-1.5-3.23-2.92-4.68-4.41A8.34,8.34,0,0,1,4.08,9.54,7.06,7.06,0,0,1,4.26,5,6.73,6.73,0,0,1,8.61,1.42a6.63,6.63,0,0,1,6.89,1.57,6.63,6.63,0,0,1,6.89-1.57A6.73,6.73,0,0,1,26.74,5a7.06,7.06,0,0,1,.18,4.58,8.34,8.34,0,0,1-2.33,4.31c-1.45,1.49-3,2.91-4.68,4.41l-.24.22c-1.23,1.12-2.6,2.34-4.12,3.65A2.57,2.57,0,0,1,17.12,22.75Z"/>
+                        <path d="M17.12,22.75a2.57,2.57,0,0,1-1.67-.62c-1.52-1.31-2.89-2.53-4.12-3.65l-.24-.22c-1.66-1.5-3.23-2.92-4.68-4.41A8.34,8.34,0,0,1,4.08,9.54,7.06,7.06,0,0,1,4.26,5,6.73,6.73,0,0,1,8.61,1.42a6.63,6.63,0,0,1,6.89,1.57,6.63,6.63,0,0,1,6.89-1.57A6.73,6.73,0,0,1,26.74,5a7.06,7.06,0,0,1,.18,4.58,8.34,8.34,0,0,1-2.33,4.31c-1.45,1.49-3,2.91-4.68,4.41l-.24.22c-1.23,1.12-2.6,2.34-4.12,3.65A2.57,2.57,0,0,1,17.12,22.75Z" />
                       </svg>
                     </div>
                   </div>
-                  
+
                   {/* Loading text with dots animation */}
                   <div className="flex items-center justify-center space-x-1">
                     <p className="text-[#22c55e] font-medium text-lg">Identifying your plant</p>
@@ -169,7 +179,7 @@ export default function Home() {
                       <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-bounce"></span>
                     </div>
                   </div>
-                  
+
                   <p className="text-gray-500 text-sm mt-2">
                     Our AI is analyzing your plant's characteristics
                   </p>
@@ -184,7 +194,7 @@ export default function Home() {
               <h2 className="text-3xl font-bold text-[#22c55e] text-center mb-8">
                 How It Works
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Step 1: Upload - Now Clickable */}
                 <div className="relative group">
