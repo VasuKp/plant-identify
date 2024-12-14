@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 
 interface ImageUploadProps {
@@ -11,6 +11,7 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isCapturing, setIsCapturing] = useState(false)
+  const [stream, setStream] = useState<MediaStream | null>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -24,7 +25,6 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
       reader.onloadend = () => {
         const base64String = reader.result as string
         setPreview(base64String)
-        // Removed automatic onImageSelect call to wait for Identify button click
       }
       reader.readAsDataURL(file)
     }
@@ -32,41 +32,77 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        setIsCapturing(true)
+      // First, check if the browser supports getUserMedia
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera access is not supported by your browser');
       }
+
+      // Request camera access with specific constraints
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment', // Use back camera on mobile devices
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
+
+      // Store the stream in state
+      setStream(mediaStream);
+
+      // Set the stream to the video element
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        await videoRef.current.play(); // Explicitly start playing
+      }
+
+      setIsCapturing(true);
+      setError(null);
     } catch (err) {
-      setError('Unable to access camera. Please grant camera permission and try again.')
-      console.error('Error accessing camera:', err)
+      console.error('Camera access error:', err);
+      setError('Unable to access camera. Please ensure you have granted camera permissions.');
     }
   }
 
   const captureImage = () => {
     if (videoRef.current) {
-      const canvas = document.createElement('canvas')
-      canvas.width = videoRef.current.videoWidth
-      canvas.height = videoRef.current.videoHeight
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        ctx.drawImage(videoRef.current, 0, 0)
-        const base64String = canvas.toDataURL('image/jpeg')
-        setPreview(base64String)
-        // Removed automatic onImageSelect call to wait for Identify button click
-        stopCamera()
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoRef.current.videoWidth;
+        canvas.height = videoRef.current.videoHeight;
+        
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Flip the image horizontally if using front camera
+          // ctx.scale(-1, 1);
+          ctx.drawImage(videoRef.current, 0, 0);
+          
+          const imageData = canvas.toDataURL('image/jpeg', 0.8);
+          setPreview(imageData);
+          stopCamera();
+        }
+      } catch (err) {
+        console.error('Error capturing image:', err);
+        setError('Failed to capture image');
       }
     }
   }
 
   const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream
-      stream.getTracks().forEach(track => track.stop())
-      videoRef.current.srcObject = null
-      setIsCapturing(false)
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
     }
+    setIsCapturing(false);
   }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
 
   return (
     <div className="space-y-6">
@@ -102,12 +138,15 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
 
       {isCapturing && (
         <div className="space-y-4">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            className="w-full rounded-lg"
-          />
+          <div className="relative w-full h-[60vh] bg-black rounded-lg overflow-hidden">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="absolute top-0 left-0 w-full h-full object-contain"
+            />
+          </div>
           <div className="flex justify-center space-x-4">
             <button
               onClick={captureImage}
@@ -136,7 +175,6 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
             />
           </div>
           <div className="flex justify-center space-x-4">
-            {/* Identify Plant Button */}
             <button
               onClick={() => preview && onImageSelect(preview)}
               className="bg-[#22c55e] text-white px-6 py-2 rounded-lg hover:bg-[#1ea550] transition-colors flex items-center gap-2"
@@ -157,7 +195,6 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
               Identify Plant
             </button>
             
-            {/* Remove Image Button */}
             <button
               onClick={() => {
                 setPreview(null)
