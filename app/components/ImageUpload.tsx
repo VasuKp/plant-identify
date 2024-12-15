@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
 
 interface ImageUploadProps {
   onImageSelect: (base64: string) => void
@@ -8,9 +7,10 @@ interface ImageUploadProps {
 const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
   const [preview, setPreview] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isCapturing, setIsCapturing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [isCapturing, setIsCapturing] = useState(false)
+  const canvasRef = useRef<HTMLCanvasElement>(null) // Add canvas ref
   const [stream, setStream] = useState<MediaStream | null>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,6 +25,7 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
       reader.onloadend = () => {
         const base64String = reader.result as string
         setPreview(base64String)
+        onImageSelect(base64String)
       }
       reader.readAsDataURL(file)
     }
@@ -32,58 +33,67 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
 
   const startCamera = async () => {
     try {
-      // First, check if the browser supports getUserMedia
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera access is not supported by your browser');
-      }
-
-      // Request camera access with specific constraints
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
+      const constraints = {
         video: {
-          facingMode: 'environment', // Use back camera on mobile devices
+          facingMode: { exact: "environment" },
           width: { ideal: 1280 },
           height: { ideal: 720 }
         }
+      };
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints).catch(async () => {
+        console.log('Falling back to any available camera');
+        return await navigator.mediaDevices.getUserMedia({
+          video: true
+        });
       });
 
-      // Store the stream in state
-      setStream(mediaStream);
-
-      // Set the stream to the video element
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        await videoRef.current.play(); // Explicitly start playing
+        videoRef.current.play();
+        setStream(mediaStream);
+        setIsCapturing(true);
+        setError(null);
       }
-
-      setIsCapturing(true);
-      setError(null);
     } catch (err) {
       console.error('Camera access error:', err);
-      setError('Unable to access camera. Please ensure you have granted camera permissions.');
+      setError('Unable to access camera. Please ensure camera permissions are granted.');
     }
   }
 
   const captureImage = () => {
-    if (videoRef.current) {
+    if (videoRef.current && canvasRef.current) {
       try {
-        const canvas = document.createElement('canvas');
-        canvas.width = videoRef.current.videoWidth;
-        canvas.height = videoRef.current.videoHeight;
-        
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+
+        // Set canvas size to match video dimensions
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Get the canvas context and draw the video frame
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          // Flip the image horizontally if using front camera
-          // ctx.scale(-1, 1);
-          ctx.drawImage(videoRef.current, 0, 0);
+          // Flip horizontally if using front camera
+          if (stream?.getVideoTracks()[0].getSettings().facingMode === 'user') {
+            ctx.scale(-1, 1);
+            ctx.translate(-canvas.width, 0);
+          }
           
-          const imageData = canvas.toDataURL('image/jpeg', 0.8);
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          // Convert to base64
+          const imageData = canvas.toDataURL('image/jpeg', 0.9);
           setPreview(imageData);
+          onImageSelect(imageData);
           stopCamera();
         }
       } catch (err) {
         console.error('Error capturing image:', err);
         setError('Failed to capture image');
       }
+    } else {
+      setError('Camera not properly initialized');
     }
   }
 
@@ -95,7 +105,6 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
     setIsCapturing(false);
   }
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (stream) {
@@ -146,6 +155,11 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
               muted
               className="absolute top-0 left-0 w-full h-full object-contain"
             />
+            {/* Add hidden canvas element */}
+            <canvas
+              ref={canvasRef}
+              className="hidden"
+            />
           </div>
           <div className="flex justify-center space-x-4">
             <button
@@ -167,11 +181,10 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
       {preview && (
         <div className="space-y-4">
           <div className="relative w-full h-64">
-            <Image
+            <img
               src={preview}
               alt="Preview"
-              fill
-              className="object-contain rounded-lg"
+              className="w-full h-full object-contain rounded-lg"
             />
           </div>
           <div className="flex justify-center space-x-4">
