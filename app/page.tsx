@@ -16,7 +16,6 @@ interface PlantInfo {
 
 export default function Home() {
   const [plantData, setPlantData] = useState<PlantInfo | null>(null);
-  // const [plantData, setPlantData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -24,7 +23,6 @@ export default function Home() {
   const handleUploadCardClick = () => {
     fileInputRef.current?.click();
   };
-
 
   const identifyPlant = async (imageBase64: string) => {
     setLoading(true)
@@ -150,7 +148,11 @@ export default function Home() {
             )}
 
             <div className="bg-[#fff9ed] rounded-xl shadow-lg border border-[#e6d5bc] p-8">
-              <ImageUpload onImageSelect={identifyPlant} />
+              <ImageUpload 
+                onImageSelect={identifyPlant}
+                isLoading={loading}
+                plantData={plantData}
+              />
             </div>
 
             {/* Loading and Results Section */}
@@ -158,7 +160,6 @@ export default function Home() {
               {loading && (
                 <div className="text-center p-8 bg-[#fff9ed] rounded-xl shadow-lg border border-[#e6d5bc]">
                   <div className="relative w-24 h-24 mx-auto mb-4">
-                    {/* Leaf Loading Animation */}
                     <div className="absolute inset-0 flex items-center justify-center">
                       <svg
                         className="animate-spin-slow w-16 h-16 text-[#22c55e]"
@@ -170,7 +171,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Loading text with dots animation */}
                   <div className="flex items-center justify-center space-x-1">
                     <p className="text-[#22c55e] font-medium text-lg">Identifying your plant</p>
                     <div className="flex space-x-1">
