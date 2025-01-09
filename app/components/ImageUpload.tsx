@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import Webcam from 'react-webcam'
 
 interface ImageUploadProps {
   onImageSelect: (base64: string) => void
@@ -15,11 +16,19 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
   const [error, setError] = useState<string | null>(null)
   const [isCapturing, setIsCapturing] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isCameraSupported, setIsCameraSupported] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [stream, setStream] = useState<MediaStream | null>(null)
+  const webcamRef = useRef<Webcam>(null)
+
+  // Check if device is mobile/tablet
+  useEffect(() => {
+    const checkDevice = () => {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isMobileDevice);
+    };
+
+    checkDevice();
+  }, []);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -39,80 +48,38 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
     }
   }
 
-  const startCamera = async () => {
-    setIsLoading(true)
-    try {
-      const constraints = {
-        video: {
-          facingMode: { exact: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      }
-
-      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints).catch(async () => {
-        console.log('Falling back to any available camera')
-        return await navigator.mediaDevices.getUserMedia({
-          video: true
-        })
-      })
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream
-        await videoRef.current.play()
-        setStream(mediaStream)
-        setIsCapturing(true)
-        setError(null)
-      }
-    } catch (err) {
-      console.error('Camera access error:', err)
-      setError('Unable to access camera. Please ensure camera permissions are granted.')
-    } finally {
-      setIsLoading(false)
-    }
+  const startCamera = () => {
+    setError(null)
+    setIsCapturing(true)
   }
 
-  const captureImage = () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current
-      const canvas = canvasRef.current
-
-      // Set canvas dimensions to match video dimensions
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-
-      // Draw the video frame to the canvas
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-
-        // Convert the canvas to a base64 string
-        const imageData = canvas.toDataURL('image/jpeg', 0.8)
-        setPreview(imageData)
-        onImageSelect(imageData)
-
-        // Stop the camera stream
-        stopCamera()
+  const captureImage = useCallback(() => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot()
+      if (imageSrc) {
+        setPreview(imageSrc)
+        onImageSelect(imageSrc)
+        setIsCapturing(false)
       }
     }
+  }, [onImageSelect])
+
+  // Different video constraints for mobile and desktop
+  const videoConstraints = isMobile ? {
+    width: 1280,
+    height: 720,
+    facingMode: { exact: "environment" }
+  } : {
+    width: 1280,
+    height: 720,
+    facingMode: "user"
   }
 
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop())
-      setStream(null)
-    }
+  const handleUserMediaError = useCallback((error: string) => {
+    console.error('Webcam Error:', error)
+    setError('Unable to access camera. Please ensure camera permissions are granted.')
     setIsCapturing(false)
-  }
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
-      }
-    }
-  }, [stream])
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -146,19 +113,19 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
         <div className="text-red-500 text-center text-lg">{error}</div>
       )}
 
+      {isLoading && <LoadingSpinner />}
+
       {isCapturing && (
         <div className="space-y-4">
           <div className="relative w-full h-[60vh] bg-black rounded-lg overflow-hidden">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
+            <Webcam
+              ref={webcamRef}
+              audio={false}
+              screenshotFormat="image/jpeg"
+              videoConstraints={videoConstraints}
+              onUserMediaError={handleUserMediaError}
               className="absolute top-0 left-0 w-full h-full object-contain"
-            />
-            <canvas
-              ref={canvasRef}
-              className="hidden"
+              mirrored={!isMobile} // Mirror only on desktop for better UX
             />
           </div>
           <div className="flex justify-center space-x-4">
@@ -169,7 +136,7 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
               Capture Photo
             </button>
             <button
-              onClick={stopCamera}
+              onClick={() => setIsCapturing(false)}
               className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
             >
               Cancel
@@ -207,7 +174,7 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
               </svg>
               Identify Plant
             </button>
-            
+
             <button
               onClick={() => {
                 setPreview(null)
