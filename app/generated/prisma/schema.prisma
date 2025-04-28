@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+  // Make sure this is regenerated whenever the schema changes
+  // Run: npx prisma generate
+}
+
+// IMPORTANT: The DATABASE_URL must be a valid PostgreSQL connection string
+// with format: "postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+// For Supabase: postgresql://postgres.PROJECT_ID:PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  password      String
+  phoneNumber   String?
+  profileImage  String?
+  address       String?
+  bio           String?
+  role          String    @default("USER")
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  cart          Cart?
+  orders        Order[]
+  searchHistory Search[]
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  plantId   String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  plant     Plant    @relation(fields: [plantId], references: [id])
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, plantId])
+}
+
+model Plant {
+  id             String      @id @default(uuid())
+  name           String
+  nameHi         String
+  nameGu         String
+  scientificName String
+  price          Float
+  image          String
+  fallbackImage  String
+  category       String
+  difficulty     String
+  light          String
+  water          String
+  petFriendly    Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+}
+
+model Search {
+  id        String   @id @default(uuid())
+  userId    String
+  query     String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  userId    String
+  status    String      @default("PENDING")
+  total     Float
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  plantId   String
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  plant     Plant    @relation(fields: [plantId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, plantId])
+}

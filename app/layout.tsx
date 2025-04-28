@@ -1,22 +1,32 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import { LanguageProvider } from '../app/context/languagecontext';
+import { AuthProvider } from '../app/context/authContext';
+import { Inter } from 'next/font/google';
+import './globals.css';
 
-const inter = Inter({ subsets: ["latin"] });
+// Import database initialization (will run on server)
+import './db-init';
 
-export const metadata: Metadata = {
-  title: "Plant Identifier",
-  description: "Identify plants using AI",
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata = {
+  title: 'Plant Identifier',
+  description: 'Identify, learn about, and care for plants',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <AuthProvider>
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }

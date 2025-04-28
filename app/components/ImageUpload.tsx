@@ -75,7 +75,7 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
     facingMode: "user"
   }
 
-  const handleUserMediaError = useCallback((error: string) => {
+  const handleUserMediaError = useCallback((error: string | DOMException) => {
     console.error('Webcam Error:', error)
     setError('Unable to access camera. Please ensure camera permissions are granted.')
     setIsCapturing(false)
@@ -87,14 +87,14 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
         <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-64 bg-[#22c55e] text-white text-xl font-semibold px-8 py-4 rounded-lg hover:bg-[#1ea550] transition-colors"
+            className="w-64 bg-[#22c55e] text-white text-xl font-semibold px-8 py-4 rounded-lg hover:bg-[#1ea550] transition-colors shadow-md"
           >
             Upload Image
           </button>
 
           <button
             onClick={startCamera}
-            className="w-64 bg-[#22c55e] text-white text-xl font-semibold px-8 py-4 rounded-lg hover:bg-[#1ea550] transition-colors"
+            className="w-64 bg-[#22c55e] text-white text-xl font-semibold px-8 py-4 rounded-lg hover:bg-[#1ea550] transition-colors shadow-md"
           >
             Take Photo
           </button>
@@ -157,7 +157,8 @@ const ImageUpload = ({ onImageSelect }: ImageUploadProps) => {
           <div className="flex justify-center space-x-4">
             <button
               onClick={() => preview && onImageSelect(preview)}
-              className="bg-[#22c55e] text-white px-6 py-2 rounded-lg hover:bg-[#1ea550] transition-colors flex items-center gap-2"
+              className="bg-[#22c55e] text-white px-6 py-2 rounded-lg hover:bg-[#1ea550] transition-colors flex items-center gap-2 relative"
+              disabled={isLoading}
             >
               <svg 
                 className="w-5 h-5" 
