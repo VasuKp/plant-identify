@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { authenticateUser, testConnection } from '@/app/lib/db';
 
 // Validation schema
 const loginSchema = z.object({
@@ -28,9 +29,22 @@ const DEMO_USERS = [
   }
 ];
 
+// Make sure database connection works
+testConnection().then(connected => {
+  console.log(`[Login API] Database connection test result: ${connected ? 'SUCCESS' : 'FAILED'}`);
+  if (!connected) {
+    console.error('[Login API] Database connection failed - login functionality for real users may not work');
+  }
+}).catch(err => {
+  console.error('[Login API] Database connection test error:', err);
+});
+
 export async function POST(req: NextRequest) {
+  console.log('[Login API] Received login request');
+  
   try {
     const body = await req.json();
+    console.log('[Login API] Request body email:', body?.email);
     
     // Validate request body
     const validationResult = loginSchema.safeParse(body);
@@ -83,15 +97,36 @@ export async function POST(req: NextRequest) {
       });
     }
     
-    // In a real application, you would verify against actual user records in your database
-    // For demo, we'll just return an error for any non-demo users
+    // Try to authenticate from database for real users
+    console.log('[Login API] Authenticating user from database:', email);
+    const authResult = await authenticateUser(email, password);
+    
+    if (authResult) {
+      console.log('[Login API] Database authentication successful for:', email);
+      return NextResponse.json({
+        success: true,
+        message: "Login successful",
+        token: authResult.token,
+        user: {
+          id: authResult.id,
+          name: authResult.name,
+          email: authResult.email,
+          phoneNumber: authResult.phoneNumber,
+          role: authResult.role,
+          lastLogin: new Date().toISOString()
+        }
+      });
+    }
+    
+    // Authentication failed
+    console.log('[Login API] Authentication failed for:', email);
     return NextResponse.json({
       success: false,
       message: "Invalid email or password"
     }, { status: 401 });
     
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('[Login API] Login error:', error);
     return NextResponse.json({
       success: false,
       message: "An error occurred during login"

@@ -7,7 +7,26 @@ interface ImageUploadProps {
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#22c55e]"></div>
+    <svg className="w-12 h-12 text-[#22c55e]" viewBox="0 0 24 24">
+      <g>
+        <path fill="currentColor" d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20a4.67,4.67,0,0,0,1.43-.23,3.86,3.86,0,0,0-.8-1.57,3.42,3.42,0,0,0-1.47-1A3.81,3.81,0,0,0,5.6,17.1l-.21.06A14.71,14.71,0,0,1,9,12.31,13.56,13.56,0,0,1,12.34,10,12.21,12.21,0,0,1,17,8Z">
+          <animateTransform
+            attributeName="transform"
+            attributeType="XML"
+            type="rotate"
+            from="0 12 12"
+            to="360 12 12"
+            dur="2s"
+            repeatCount="indefinite"
+          />
+        </path>
+        <animateMotion
+          path="M0,0 a6,6 0 1,1 0,0.1"
+          dur="1.5s"
+          repeatCount="indefinite"
+        />
+      </g>
+    </svg>
   </div>
 )
 

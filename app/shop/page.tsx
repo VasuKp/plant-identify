@@ -486,11 +486,10 @@ export default function ShopPlants() {
                 {/* Plant Grid */}
                 {loading ? (
                     <div className="py-20 text-center">
-                        <svg className="w-12 h-12 mx-auto text-[#22c55e] animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg className="w-16 h-16 mx-auto text-[#22c55e] animate-pulse" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M17.1,7.8C15.6,6.3,13.5,5.5,11.4,5.5c-0.5,0-1,0-1.5,0.1C4.7,6.4,1.6,11.4,2.5,16.6c0.2,1.2,0.6,2.3,1.2,3.4 c0.1,0.2,0.3,0.3,0.5,0.3c0.1,0,0.2,0,0.3-0.1c0.3-0.2,0.4-0.5,0.2-0.8c-0.5-0.9-0.9-1.9-1.1-3c-0.7-4.3,2-8.5,6.3-9.4 C13.5,6.1,17,8.1,18,11.5c0.1,0.3,0.4,0.6,0.7,0.6c0.1,0,0.1,0,0.2,0c0.4-0.1,0.7-0.5,0.6-0.9C19.2,9.7,18.3,8.6,17.1,7.8z M7.4,18.5c-0.2,0-0.3,0-0.5-0.1c-0.7-0.4-0.9-1.4-0.5-2.1c0.6-1,1.5-1.9,2.5-2.6c0.9-0.6,1.9-1,3-1.3c0.3-0.1,0.5-0.1,0.8-0.2 c0.2,0,0.5-0.1,0.7-0.1c0.4-0.1,0.9,0.2,1,0.6c0.1,0.4-0.2,0.9-0.6,1c-0.2,0-0.4,0.1-0.5,0.1c-0.2,0-0.4,0.1-0.6,0.1 c-0.9,0.2-1.7,0.6-2.4,1.1c-0.7,0.5-1.4,1.1-1.9,1.9c-0.2,0.4-0.6,0.6-1,0.6C7.4,18.5,7.4,18.5,7.4,18.5z"/>
                         </svg>
-                        <p className="mt-4 text-gray-600">{t.loading}</p>
+                        <p className="text-gray-600">{t.loading}</p>
                     </div>
                 ) : filteredPlants.length === 0 ? (
                     <div className="py-20 text-center">

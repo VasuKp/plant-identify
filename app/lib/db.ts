@@ -1,3 +1,5 @@
+'use server'
+
 import { Pool } from 'pg'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
@@ -5,15 +7,24 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-})
+// Only attempt to connect if DATABASE_URL is defined
+const pool = process.env.DATABASE_URL 
+  ? new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    })
+  : null;
 
 // Create necessary tables if they don't exist
 export const initializeDatabase = async () => {
+  // Check if pool is initialized
+  if (!pool) {
+    console.error('Database connection not initialized - missing DATABASE_URL');
+    return false;
+  }
+
   const client = await pool.connect()
   try {
     await client.query(`
@@ -54,6 +65,10 @@ export const initializeDatabase = async () => {
 // Test database connection
 export const testConnection = async () => {
   try {
+    if (!pool) {
+      console.error('Database connection not initialized - missing DATABASE_URL');
+      return false;
+    }
     const client = await pool.connect()
     client.release()
     return true
@@ -85,6 +100,9 @@ export const createUser = async (userData: {
   password: string
   phoneNumber?: string
 }) => {
+  if (!pool) {
+    throw new Error('Database connection not initialized - missing DATABASE_URL');
+  }
   const client = await pool.connect()
   try {
     await client.query('BEGIN')
@@ -127,6 +145,10 @@ export const createUser = async (userData: {
 }
 
 export const authenticateUser = async (email: string, password: string) => {
+  if (!pool) {
+    console.error('Database connection not initialized - missing DATABASE_URL');
+    return null;
+  }
   const client = await pool.connect()
   try {
     // Find user by email
@@ -181,6 +203,10 @@ export const authenticateUser = async (email: string, password: string) => {
 }
 
 export const validateToken = async (token: string) => {
+  if (!pool) {
+    console.error('Database connection not initialized - missing DATABASE_URL');
+    return null;
+  }
   const client = await pool.connect()
   try {
     const sessionResult = await client.query(
@@ -212,6 +238,10 @@ export const validateToken = async (token: string) => {
 }
 
 export const logoutUser = async (token: string) => {
+  if (!pool) {
+    console.error('Database connection not initialized - missing DATABASE_URL');
+    return false;
+  }
   const client = await pool.connect()
   try {
     await client.query(
@@ -228,6 +258,10 @@ export const logoutUser = async (token: string) => {
 }
 
 export const findUserByEmail = async (email: string) => {
+  if (!pool) {
+    console.error('Database connection not initialized - missing DATABASE_URL');
+    return null;
+  }
   const client = await pool.connect()
   try {
     const result = await client.query(
@@ -241,6 +275,9 @@ export const findUserByEmail = async (email: string) => {
 }
 
 export const updateUserPassword = async (userId: string, newPassword: string) => {
+  if (!pool) {
+    throw new Error('Database connection not initialized - missing DATABASE_URL');
+  }
   const client = await pool.connect()
   try {
     const hashedPassword = await hashPassword(newPassword)

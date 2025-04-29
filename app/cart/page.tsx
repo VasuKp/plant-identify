@@ -315,8 +315,27 @@ export default function Cart() {
         
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="w-16 h-16 border-4 border-[#22c55e] border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-600">{t.loading}</p>
+            <svg className="w-16 h-16 text-[#22c55e]" viewBox="0 0 24 24">
+              <g>
+                <path fill="currentColor" d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20a4.67,4.67,0,0,0,1.43-.23,3.86,3.86,0,0,0-.8-1.57,3.42,3.42,0,0,0-1.47-1A3.81,3.81,0,0,0,5.6,17.1l-.21.06A14.71,14.71,0,0,1,9,12.31,13.56,13.56,0,0,1,12.34,10,12.21,12.21,0,0,1,17,8Z">
+                  <animateTransform
+                      attributeName="transform"
+                      attributeType="XML"
+                      type="rotate"
+                      from="0 12 12"
+                      to="360 12 12"
+                      dur="2s"
+                      repeatCount="indefinite"
+                  />
+                </path>
+                <animateMotion
+                    path="M0,0 a6,6 0 1,1 0,0.1"
+                    dur="1.5s"
+                    repeatCount="indefinite"
+                />
+              </g>
+            </svg>
+            <p className="text-gray-600 mt-4">{t.loading}</p>
           </div>
         ) : error ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
@@ -408,7 +427,26 @@ export default function Cart() {
                             </button>
                             {isUpdating[item.id] && (
                               <span className="ml-2">
-                                <div className="w-4 h-4 border-2 border-[#22c55e] border-t-transparent rounded-full animate-spin"></div>
+                                <svg className="w-4 h-4 text-[#22c55e]" viewBox="0 0 24 24">
+                                  <g>
+                                    <path fill="currentColor" d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20a4.67,4.67,0,0,0,1.43-.23,3.86,3.86,0,0,0-.8-1.57,3.42,3.42,0,0,0-1.47-1A3.81,3.81,0,0,0,5.6,17.1l-.21.06A14.71,14.71,0,0,1,9,12.31,13.56,13.56,0,0,1,12.34,10,12.21,12.21,0,0,1,17,8Z">
+                                      <animateTransform
+                                          attributeName="transform"
+                                          attributeType="XML"
+                                          type="rotate"
+                                          from="0 12 12"
+                                          to="360 12 12"
+                                          dur="1s"
+                                          repeatCount="indefinite"
+                                      />
+                                    </path>
+                                    <animateMotion
+                                        path="M0,0 a3,3 0 1,1 0,0.1"
+                                        dur="1s"
+                                        repeatCount="indefinite"
+                                    />
+                                  </g>
+                                </svg>
                               </span>
                             )}
                           </div>

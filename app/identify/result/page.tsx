@@ -32,8 +32,8 @@ export default function IdentificationResult() {
   const [showNurseryPrompt, setShowNurseryPrompt] = useState(false)
   
   // Extract the plant ID or image from search params
-  const plantId = searchParams.get('id')
-  const imageUrl = searchParams.get('image')
+  const plantId = searchParams?.get('id') || ''
+  const imageUrl = searchParams?.get('image') || ''
 
   useEffect(() => {
     const fetchPlantDetails = async () => {
@@ -46,17 +46,17 @@ export default function IdentificationResult() {
           // Sample data
           const samplePlant: PlantResult = {
             id: plantId || 'plant123',
-            name: 'Monstera Deliciosa',
-            scientificName: 'Monstera deliciosa',
-            description: 'The Monstera Deliciosa, or Swiss Cheese Plant, is famous for its quirky natural leaf holes. This popular houseplant is native to tropical forests of southern Mexico and is relatively easy to care for, making it perfect for beginner plant parents.',
-            image: imageUrl || '/images/plants/monstera-deliciosa.jpg',
+            name: 'Frangipani',
+            scientificName: 'Plumeria rubra',
+            description: 'The image shows a cluster of Plumeria flowers with delicate, overlapping petals in shades of pink, yellow, and white. The flowers emerge from a backdrop of vibrant, elliptical green leaves. The overall impression is one of tropical beauty and fragrance.',
+            image: imageUrl || '/images/plants/frangipani.jpg',
             careInfo: {
-              light: 'Bright, indirect light. Avoid direct sunlight as it can scorch the leaves.',
-              water: 'Water when the top 2-3 inches of soil are dry. Reduce watering in winter.',
-              temperature: 'Prefers temperatures between 65-85°F (18-29°C). Keep away from cold drafts.',
-              soil: 'Well-draining potting mix rich in organic matter.'
+              light: 'Full sun, at least six hours of direct sunlight per day.',
+              water: 'Water deeply but infrequently, allowing the soil to dry out between waterings.',
+              temperature: 'Prefers warm, tropical climates between 65-85°F (18-29°C). Protect from frost.',
+              soil: 'Well-draining soil with a slightly acidic pH.'
             },
-            similarPlants: ['Philodendron', 'Pothos', 'Peace Lily']
+            similarPlants: ['Desert Rose', 'Hibiscus', 'Bougainvillea'],
           }
           
           setPlant(samplePlant)

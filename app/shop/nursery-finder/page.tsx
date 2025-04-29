@@ -726,9 +726,25 @@ export default function NurseryFinder() {
             {/* Map/List View Content */}
             {isLoading ? (
               <div className="py-20 text-center">
-                <svg className="w-12 h-12 mx-auto text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg className="w-12 h-12 mx-auto text-blue-600" viewBox="0 0 24 24">
+                  <g>
+                    <path fill="currentColor" d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20a4.67,4.67,0,0,0,1.43-.23,3.86,3.86,0,0,0-.8-1.57,3.42,3.42,0,0,0-1.47-1A3.81,3.81,0,0,0,5.6,17.1l-.21.06A14.71,14.71,0,0,1,9,12.31,13.56,13.56,0,0,1,12.34,10,12.21,12.21,0,0,1,17,8Z">
+                      <animateTransform
+                          attributeName="transform"
+                          attributeType="XML"
+                          type="rotate"
+                          from="0 12 12"
+                          to="360 12 12"
+                          dur="2s"
+                          repeatCount="indefinite"
+                      />
+                    </path>
+                    <animateMotion
+                        path="M0,0 a6,6 0 1,1 0,0.1"
+                        dur="1.5s"
+                        repeatCount="indefinite"
+                    />
+                  </g>
                 </svg>
                 <p className="mt-4 text-gray-600">Finding nurseries near you...</p>
               </div>
@@ -931,9 +947,25 @@ export default function NurseryFinder() {
                     
                     {mapStatus === 'loading' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20">
-                        <svg className="w-12 h-12 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg className="w-12 h-12 text-blue-600" viewBox="0 0 24 24">
+                          <g>
+                            <path fill="currentColor" d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20a4.67,4.67,0,0,0,1.43-.23,3.86,3.86,0,0,0-.8-1.57,3.42,3.42,0,0,0-1.47-1A3.81,3.81,0,0,0,5.6,17.1l-.21.06A14.71,14.71,0,0,1,9,12.31,13.56,13.56,0,0,1,12.34,10,12.21,12.21,0,0,1,17,8Z">
+                              <animateTransform
+                                  attributeName="transform"
+                                  attributeType="XML"
+                                  type="rotate"
+                                  from="0 12 12"
+                                  to="360 12 12"
+                                  dur="2s"
+                                  repeatCount="indefinite"
+                              />
+                            </path>
+                            <animateMotion
+                                path="M0,0 a6,6 0 1,1 0,0.1"
+                                dur="1.5s"
+                                repeatCount="indefinite"
+                            />
+                          </g>
                         </svg>
                         <p className="ml-3 text-gray-700">Loading map...</p>
                       </div>

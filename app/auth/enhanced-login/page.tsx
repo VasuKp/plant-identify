@@ -16,11 +16,37 @@ import {
   FaRegQuestionCircle,
   FaFingerprint
 } from 'react-icons/fa'
-import { findUserByEmail } from '@/app/lib/db'
+import { authenticateUser, findUserByEmail } from '@/app/actions/auth'
 import bcrypt from 'bcryptjs'
 
 // Email validation regex
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+// Define interface for auth response types
+interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+interface AuthResponse {
+  success: boolean;
+  user?: AuthUser;
+  token?: string;
+  error?: string;
+}
+
+interface UserResponse {
+  success: boolean;
+  user?: {
+    id: string;
+    email: string;
+    name?: string;
+    role?: string;
+  };
+  error?: string;
+}
 
 export default function EnhancedLoginPage() {
   const router = useRouter()
@@ -189,21 +215,23 @@ export default function EnhancedLoginPage() {
     setLoading(true)
     
     try {
-      // Find user in database
-      const user = await findUserByEmail(email)
+      // Find user in database using server action
+      const userResult = await findUserByEmail(email) as UserResponse
       
-      if (!user) {
+      if (!userResult.success) {
         setError('Invalid email or password')
         recordFailedAttempt()
+        setLoading(false)
         return
       }
+
+      // Authenticate using server action
+      const authResult = await authenticateUser(email, password) as AuthResponse
       
-      // Verify password
-      const isValidPassword = await bcrypt.compare(password, user.password)
-      
-      if (!isValidPassword) {
+      if (!authResult.success) {
         setError('Invalid email or password')
         recordFailedAttempt()
+        setLoading(false)
         return
       }
       
@@ -214,33 +242,36 @@ export default function EnhancedLoginPage() {
         return
       }
       
-      // Update last login
-      await findUserByEmail(user.id)
-      
       // Create session
-      const token = "user-token-" + Math.random().toString(36).substring(2, 15)
-      localStorage.setItem('authToken', token)
-      localStorage.setItem('currentUser', JSON.stringify({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }))
+      const token = authResult.token || "user-token-" + Math.random().toString(36).substring(2, 15)
       
-      // Save device if "remember me" is checked
-      if (rememberMe) {
-        localStorage.setItem('trustedDeviceId', deviceId)
+      // Make sure we have user data before storing it
+      if (authResult.user) {
+        localStorage.setItem('authToken', token)
+        localStorage.setItem('currentUser', JSON.stringify({
+          id: authResult.user.id,
+          name: authResult.user.name,
+          email: authResult.user.email,
+          role: authResult.user.role
+        }))
+        
+        // Save device if "remember me" is checked
+        if (rememberMe) {
+          localStorage.setItem('trustedDeviceId', deviceId)
+        }
+        
+        setSuccess('Login successful!')
+        
+        // Redirect to dashboard
+        router.push('/dashboard')
+      } else {
+        setError('Unable to retrieve user information')
+        setLoading(false)
       }
-      
-      setSuccess('Login successful!')
-      
-      // Redirect to dashboard
-      router.push('/dashboard')
     } catch (error) {
       setError('An error occurred during login')
       console.error('Login error:', error)
       recordFailedAttempt()
-    } finally {
       setLoading(false)
     }
   }

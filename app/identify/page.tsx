@@ -317,17 +317,42 @@ export default function Home() {
                             />
                         </div>
 
-                        {/* Loading State */}
+                        {/* Loading state */}
                         {loading && (
-                            <div className="mt-8 text-center animate-pulse">
-                                <svg className="w-16 h-16 mx-auto text-[#22c55e]" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <p className="mt-4 text-xl font-medium text-[#22c55e]">
-                                    {translations.loading?.identifying || 'Identifying your plant...'}
+                            <div className="text-center p-8 bg-[#fff9ed] rounded-xl shadow-lg border border-[#e6d5bc]">
+                                <div className="relative w-24 h-24 mx-auto mb-4">
+                                    <svg className="w-16 h-16 text-[#22c55e]" viewBox="0 0 24 24">
+                                        <g>
+                                            <path fill="currentColor" d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20a4.67,4.67,0,0,0,1.43-.23,3.86,3.86,0,0,0-.8-1.57,3.42,3.42,0,0,0-1.47-1A3.81,3.81,0,0,0,5.6,17.1l-.21.06A14.71,14.71,0,0,1,9,12.31,13.56,13.56,0,0,1,12.34,10,12.21,12.21,0,0,1,17,8Z">
+                                                <animateTransform
+                                                    attributeName="transform"
+                                                    attributeType="XML"
+                                                    type="rotate"
+                                                    from="0 12 12"
+                                                    to="360 12 12"
+                                                    dur="2s"
+                                                    repeatCount="indefinite"
+                                                />
+                                            </path>
+                                            <animateMotion
+                                                path="M0,0 a4,4 0 1,1 0,0.1"
+                                                dur="2s"
+                                                repeatCount="indefinite"
+                                            />
+                                        </g>
+                                    </svg>
+                                </div>
+
+                                <p className="text-[#22c55e] font-medium text-lg">
+                                    {translations.loading?.identifying || 'Identifying your plant'}
+                                    <span className="inline-block ml-1">
+                                        <span className="w-2 h-2 bg-[#22c55e] rounded-full inline-block mx-0.5 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                        <span className="w-2 h-2 bg-[#22c55e] rounded-full inline-block mx-0.5 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                        <span className="w-2 h-2 bg-[#22c55e] rounded-full inline-block mx-0.5 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                                    </span>
                                 </p>
-                                <p className="mt-2 text-gray-600">
+
+                                <p className="text-gray-500 text-sm mt-2">
                                     {translations.loading?.analyzing || 'Our AI is analyzing your plant\'s characteristics'}
                                 </p>
                             </div>
@@ -362,12 +387,28 @@ export default function Home() {
                                     
                                     {videoLoading && (
                                         <div className="text-center py-8">
-                                            <div className="animate-pulse">
-                                                <svg className="w-12 h-12 mx-auto text-[#22c55e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <div className="flex items-center justify-center">
+                                                <svg className="w-8 h-8 mr-2 text-[#22c55e]" viewBox="0 0 24 24">
+                                                    <g>
+                                                        <path fill="currentColor" d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20a4.67,4.67,0,0,0,1.43-.23,3.86,3.86,0,0,0-.8-1.57,3.42,3.42,0,0,0-1.47-1A3.81,3.81,0,0,0,5.6,17.1l-.21.06A14.71,14.71,0,0,1,9,12.31,13.56,13.56,0,0,1,12.34,10,12.21,12.21,0,0,1,17,8Z">
+                                                            <animateTransform
+                                                                attributeName="transform"
+                                                                attributeType="XML"
+                                                                type="rotate"
+                                                                from="0 12 12"
+                                                                to="360 12 12"
+                                                                dur="1.5s"
+                                                                repeatCount="indefinite"
+                                                            />
+                                                        </path>
+                                                        <animateMotion
+                                                            path="M0,0 a3,3 0 1,1 0,0.1"
+                                                            dur="1.5s"
+                                                            repeatCount="indefinite"
+                                                        />
+                                                    </g>
                                                 </svg>
-                                                <p className="mt-4 text-gray-600">
+                                                <p className="text-gray-600">
                                                     {translations.loading?.videoLoading || 'Finding care guide videos...'}
                                                 </p>
                                             </div>

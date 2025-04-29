@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 
 // Import database initialization (will run on server)
-import './db-init';
+// import './db-init';
 
 const inter = Inter({ subsets: ['latin'] });
 

@@ -255,23 +255,36 @@ export default function Home() {
               {loading && (
                 <div className="text-center p-8 bg-[#fff9ed] rounded-xl shadow-lg border border-[#e6d5bc]">
                   <div className="relative w-24 h-24 mx-auto mb-4">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg className="animate-spin-slow w-16 h-16 text-[#22c55e]" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.12,22.75a2.57,2.57,0,0,1-1.67-.62c-1.52-1.31-2.89-2.53-4.12-3.65l-.24-.22c-1.66-1.5-3.23-2.92-4.68-4.41A8.34,8.34,0,0,1,4.08,9.54,7.06,7.06,0,0,1,4.26,5,6.73,6.73,0,0,1,8.61,1.42a6.63,6.63,0,0,1,6.89,1.57,6.63,6.63,0,0,1,6.89-1.57A6.73,6.73,0,0,1,26.74,5a7.06,7.06,0,0,1,.18,4.58,8.34,8.34,0,0,1-2.33,4.31c-1.45,1.49-3,2.91-4.68,4.41l-.24.22c-1.23,1.12-2.6,2.34-4.12,3.65A2.57,2.57,0,0,1,17.12,22.75Z" />
-                      </svg>
-                    </div>
+                    <svg className="w-16 h-16 text-[#22c55e]" viewBox="0 0 24 24">
+                      <g>
+                        <path fill="currentColor" d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20a4.67,4.67,0,0,0,1.43-.23,3.86,3.86,0,0,0-.8-1.57,3.42,3.42,0,0,0-1.47-1A3.81,3.81,0,0,0,5.6,17.1l-.21.06A14.71,14.71,0,0,1,9,12.31,13.56,13.56,0,0,1,12.34,10,12.21,12.21,0,0,1,17,8Z">
+                          <animateTransform
+                            attributeName="transform"
+                            attributeType="XML"
+                            type="rotate"
+                            from="0 12 12"
+                            to="360 12 12"
+                            dur="2s"
+                            repeatCount="indefinite"
+                          />
+                        </path>
+                        <animateMotion
+                          path="M0,0 a4,4 0 1,1 0,0.1"
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                      </g>
+                    </svg>
                   </div>
 
-                  <div className="flex items-center justify-center space-x-1">
-                    <p className="text-[#22c55e] font-medium text-lg">
-                      {translations.loading?.identifying || 'Identifying your plant'}
-                    </p>
-                    <div className="flex space-x-1">
-                      <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                      <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                      <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-bounce"></span>
-                    </div>
-                  </div>
+                  <p className="text-[#22c55e] font-medium text-lg">
+                    Identifying your plant
+                    <span className="inline-block ml-1">
+                      <span className="w-2 h-2 bg-[#22c55e] rounded-full inline-block mx-0.5 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-2 h-2 bg-[#22c55e] rounded-full inline-block mx-0.5 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-2 h-2 bg-[#22c55e] rounded-full inline-block mx-0.5 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    </span>
+                  </p>
 
                   <p className="text-gray-500 text-sm mt-2">
                     {translations.loading?.analyzing || 'Our AI is analyzing your plant\'s characteristics'}
@@ -283,9 +296,31 @@ export default function Home() {
 
               {videoLoading && (
                 <div className="text-center p-4 bg-[#fff9ed] rounded-xl shadow-lg border border-[#e6d5bc] mt-4">
-                  <p className="text-[#22c55e]">
-                    {translations.loading?.fetchingVideo || 'Fetching care guide video...'}
-                  </p>
+                  <div className="flex items-center justify-center">
+                    <svg className="w-6 h-6 mr-2 text-[#22c55e]" viewBox="0 0 24 24">
+                      <g>
+                        <path fill="currentColor" d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20a4.67,4.67,0,0,0,1.43-.23,3.86,3.86,0,0,0-.8-1.57,3.42,3.42,0,0,0-1.47-1A3.81,3.81,0,0,0,5.6,17.1l-.21.06A14.71,14.71,0,0,1,9,12.31,13.56,13.56,0,0,1,12.34,10,12.21,12.21,0,0,1,17,8Z">
+                          <animateTransform
+                            attributeName="transform"
+                            attributeType="XML"
+                            type="rotate"
+                            from="0 12 12"
+                            to="360 12 12"
+                            dur="1.5s"
+                            repeatCount="indefinite"
+                          />
+                        </path>
+                        <animateMotion
+                          path="M0,0 a2,2 0 1,1 0,0.1"
+                          dur="1s"
+                          repeatCount="indefinite"
+                        />
+                      </g>
+                    </svg>
+                    <p className="text-[#22c55e]">
+                      {translations.loading?.fetchingVideo || 'Fetching care guide video...'}
+                    </p>
+                  </div>
                 </div>
               )}
 
