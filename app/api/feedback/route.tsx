@@ -36,6 +36,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: 'Feedback received' }, { status: 200 });
     } catch (error) {
         console.error('Error sending email:', error);
-        return NextResponse.json({ error: 'Failed to send feedback: ' + error.message }, { status: 500 });
+        // Fix: safely handle the unknown error type
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        return NextResponse.json({ error: 'Failed to send feedback: ' + errorMessage }, { status: 500 });
     }
 }
